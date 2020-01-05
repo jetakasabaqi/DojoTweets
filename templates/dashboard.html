@@ -8,7 +8,32 @@
     <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='css/index.css') }}">
     <title>Dojo Tweets Dashboard</title>
 </head>
-<body>
-    <a href="/logout"><h4>Log out</h4></a>
+<body class="container">
+    <header>
+        <h4>Dojo Tweets </h1>
+        <div class="right_corner">
+            <h4>Welcome, {{session['userid']}}</h4>
+            <a href="/logout">Log out</a>
+        </div>
+    </header>
+    <main >
+        <h3>Write a tweet </h3>
+        <form class="tweet">
+                <textarea name="tweet" placeholder="What's on your mind?" id="styled"></textarea>
+                <button type='submit'>Tweet</button>
+        </form>
+    </main>
+    <div class="tweets">
+        <h3>Your feed</h3>
+
+        <div class="card">
+                <div class="container">
+                  <h4><b>Jane Doe says:</b></h4> 
+                  <p>Interior Designer Interior Designer Interior Designer Interior Designer</p> 
+                </div>
+        </div>
+    </div>
+ 
 </body>
+
 </html>
