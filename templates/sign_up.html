@@ -15,19 +15,40 @@
             <div class="form-group">
                 <label >First Name</label>
                 <input type="text"  class="form-control"  name="fname" placeholder="Enter your first name">
-              </div>
+                {% with name_error = get_flashed_messages(category_filter=["name_error"]) %}
+                {% if name_error %}
+                    {%- for msg in name_error %}
+                    <small  id="password_help" class="form-text text-muted">{{ msg }}</small>
+                    {% endfor %}
+                {% endif %}
+            {% endwith%}
+            </div>
               <div class="form-group">
                 <label >Last Name</label>
                 <input type="text" name="lname" class="form-control"   placeholder="Enter your last name">
-              </div>
+                {% with last_error = get_flashed_messages(category_filter=["last_error"]) %}
+                {% if last_error %}
+                    {%- for msg in last_error %}
+                    <small  id="password_help" class="form-text text-muted">{{ msg }}</small>
+                    {% endfor %}
+                {% endif %}
+            {% endwith%}
+            </div>
             <div class="form-group">
               <label >Email address</label>
               <input type="email" name="email" class="form-control"  name="email" placeholder="Enter email">
+              {% with email_error = get_flashed_messages(category_filter=["email_error"]) %}
+              {% if email_error %}
+                  {%- for msg in email_error %}
+                  <small  id="password_help" class="form-text text-muted">{{ msg }}</small>
+                  {% endfor %}
+              {% endif %}
+          {% endwith%}
             </div>
             <div class="form-group">
               <label>Password</label>
               <input type="password" class="form-control" name="password" placeholder="Password">
-              {% with psw_error = get_flashed_messages(category_filter=["password_error"]) %}
+              {% with psw_error = get_flashed_messages(category_filter=["psw_error"]) %}
               {% if psw_error %}
                   {%- for msg in psw_error %}
                   <small  id="password_help" class="form-text text-muted">{{ msg }}</small>
@@ -39,7 +60,7 @@
             <div class="form-group">
                 <label>Confirm Password</label>
                 <input type="password" class="form-control" name="confirm_password" placeholder="Confirm password">
-                {% with psw_error = get_flashed_messages(category_filter=["password_error"]) %}
+                {% with psw_error = get_flashed_messages(category_filter=["confirm_psw_error"]) %}
                 {% if psw_error %}
                     {%- for msg in psw_error %}
                     <small  id="password_help" class="form-text text-muted">{{ msg }}</small>
@@ -48,9 +69,9 @@
             {% endwith%}
               </div>
             <button type="submit" class="btn btn-primary">Sign Up</button>
-            {% with login_error = get_flashed_messages(category_filter=["login_error"]) %}
-            {% if login_error %}
-                {%- for msg in login_error %}
+            {% with signup_error = get_flashed_messages(category_filter=["signup_error"]) %}
+            {% if signup_error %}
+                {%- for msg in signup_error %}
                 <small  id="password_help" class="form-text text-muted">{{ msg }}</small>
                 {% endfor %}
             {% endif %}
