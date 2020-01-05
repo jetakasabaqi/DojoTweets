@@ -11,21 +11,35 @@
 <body>
     <div class="container">
         <h2>Login into your DojoTweet account</h2>
-        <form>
+        <form action="/login" method="POST">
             <div class="form-group">
-              <label for="exampleInputEmail1">Email address</label>
-              <input type="email" class="form-control" id="exampleInputEmail1" aria-describedby="emailHelp" placeholder="Enter email">
+              <label >Email address</label>
+              <input type="email" name="email" class="form-control"  name="email" placeholder="Enter email">
             </div>
             <div class="form-group">
-              <label for="exampleInputPassword1">Password</label>
-              <input type="password" class="form-control" id="exampleInputPassword1" placeholder="Password">
+              <label>Password</label>
+              <input type="password" class="form-control" name="password" placeholder="Password">
+              {% with psw_error = get_flashed_messages(category_filter=["password_error"]) %}
+              {% if psw_error %}
+                  {%- for msg in psw_error %}
+                  <small  id="password_help" class="form-text text-muted">{{ msg }}</small>
+                  {% endfor %}
+              {% endif %}
+          {% endwith%}
               <small hidden id="password_help" class="form-text text-muted">Password should be more than 5 characters and contain at least one special character, one upper letter case and one number.</small>
             </div>
             <button type="submit" class="btn btn-primary">Login</button>
+            {% with login_error = get_flashed_messages(category_filter=["login_error"]) %}
+            {% if login_error %}
+                {%- for msg in login_error %}
+                <small  id="password_help" class="form-text text-muted">{{ msg }}</small>
+                {% endfor %}
+            {% endif %}
+        {% endwith%}
           </form>
           <div class="sign_up">
             <h4>New to DojoTweet? </h4>
-            <a href="#"><h4>Sign up </h4></a>
+            <a href="/get_sign_up"><h4>Sign up </h4></a>
           </div>
          
     </div>
