@@ -1,3 +1,17 @@
 body{
     background-color: #E6ECF0;
 }
+form{
+    background-color: white;
+    padding: 25px;
+}
+#password_help{
+    color: tomato;
+}
+.sign_up{
+    display: flex;
+}
+
+.sign_up h4{
+    padding: 5px;
+}
