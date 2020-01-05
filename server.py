@@ -103,7 +103,30 @@ def signup():
 @app.route('/dashboard',methods =['GET'])
 def get_dashboard():
     if 'userid' in session:
-       return render_template('dashboard.html') 
+        mysql = connectToMySQL("dojo_tweets")
+        query = f'select * from users where users.id = {session["userid"]}'
+        result = mysql.query_db(query)
+        user = ''
+        if result:
+            user = result[0]['fname']
+        mysql = connectToMySQL("dojo_tweets")
+        query = f'select tweets.content as tweet, users.fname as username, tweets.created_at as time_posted from tweets join users on tweets.users_id = users.id order by tweets.created_at DESC;'
+        tweets = mysql.query_db(query)
+        
+        for tweet in tweets:
+            time_since_posted = datetime.datetime.now() - tweet['time_posted']
+            days = time_since_posted.days
+            hours = time_since_posted.seconds//3600 
+            minutes = (time_since_posted.seconds//60)%60
+            if days < 0 :
+                tweet['time_posted'] = (0, 0, 0)
+            tweet['time_posted'] = (days, hours, minutes)
+            print(tweet['time_posted'])
+        
+
+
+
+        return render_template('dashboard.html', user = user,tweets =tweets) 
     else:
         return redirect('/')
    
@@ -114,6 +137,32 @@ def logout_user():
     session.clear()
     return redirect('/')
 
+@app.route('/tweet/create', methods = ['POST'])
+def create_tweet():
+    isValid = True
+
+    if len(request.form['tweet']) < 1 or len(request.form['tweet']) > 255:
+        isValid = False
+        flash('Tweets must be between 1 and 255 characters long!','tweet_error') 
+    print('before valid')
+    print(isValid)
+    if isValid:
+        print('valid')
+        data = {
+            'tweet': request.form['tweet'],
+            'user_id': session['userid'],
+            'created_at': datetime.datetime.now(),
+            'updated_at': datetime.datetime.now()
+        }
+        print(data)
+        mysql = connectToMySQL("dojo_tweets")
+        query = 'insert into tweets (content,created_at, updated_at, users_id) values (%(tweet)s,%(created_at)s,%(updated_at)s,%(user_id)s);'
+        result = mysql.query_db(query,data)
+        print(result)
+
+        
+
+    return redirect('/dashboard')
 
 
 if __name__== "__main__":

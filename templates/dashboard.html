@@ -12,26 +12,48 @@
     <header>
         <h4>Dojo Tweets </h1>
         <div class="right_corner">
-            <h4>Welcome, {{session['userid']}}</h4>
+            <h4>Welcome, {{user}}</h4>
             <a href="/logout">Log out</a>
         </div>
     </header>
     <main >
         <h3>Write a tweet </h3>
-        <form class="tweet">
+        <form class="tweet" action="/tweet/create" method="POST">
                 <textarea name="tweet" placeholder="What's on your mind?" id="styled"></textarea>
                 <button type='submit'>Tweet</button>
         </form>
+        {% with tweet_error = get_flashed_messages(category_filter=["tweet_error"]) %}
+            {% if tweet_error %}
+                {%- for msg in tweet_error %}
+                <small  id="password_help" class="form-text text-muted">{{ msg }}</small>
+                {% endfor %}
+            {% endif %}
+        {% endwith%}
     </main>
     <div class="tweets">
         <h3>Your feed</h3>
 
+        {% for tweet in tweets%}
         <div class="card">
                 <div class="container">
-                  <h4><b>Jane Doe says:</b></h4> 
-                  <p>Interior Designer Interior Designer Interior Designer Interior Designer</p> 
+                  <h4><b>{{tweet['username']}} says:</b></h4> 
+                  <p>{{tweet['tweet']}}</p> 
+                  posted
+                  {% if tweet.time_posted[0] %}
+                      {{tweet.time_posted[0]}} days
+                  {% elif tweet.time_posted[1] %}
+                      {{tweet.time_since_posted[1]}} hours
+                  {% elif tweet.time_posted[2] %}
+                      {{tweet.time_posted[2]}} minutes
+                  {% else %}
+                      less than a minute
+                  {% endif%}
+                  ago
                 </div>
+ 
+
         </div>
+        {% endfor%}
     </div>
  
 </body>
