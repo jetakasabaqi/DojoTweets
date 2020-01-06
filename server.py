@@ -110,10 +110,25 @@ def get_dashboard():
         if result:
             user = result[0]['fname']
         mysql = connectToMySQL("dojo_tweets")
-        query = f'select tweets.content as tweet, users.fname as username, tweets.created_at as time_posted from tweets join users on tweets.users_id = users.id order by tweets.created_at DESC;'
-        tweets = mysql.query_db(query)
-        
-        for tweet in tweets:
+        query_all_tweets = 'select tweets.content as tweet, users.fname as username, tweets.created_at as time_posted, users.id as user_id, tweets.id as tweet_id, count(tweets.id) as times_liked FROM liked_tweets RIGHT JOIN   tweets ON liked_tweets.tweets_id =  tweets.id JOIN users ON tweets.users_id = users.id  GROUP BY tweets.id ORDER BY tweets.created_at DESC;'
+        all_tweets =  mysql.query_db(query_all_tweets)
+        print('ALL TWEETS: -------------------------',all_tweets)
+        mysql = connectToMySQL("dojo_tweets")
+        query = 'select tweets.content as tweet, users.fname as username, tweets.created_at as time_posted, users.id as user_id, tweets.id as tweet_id, count(tweets.id) as times_liked FROM liked_tweets LEFT JOIN   tweets ON liked_tweets.tweets_id =  tweets.id JOIN users ON tweets.users_id = users.id  GROUP BY tweets.id ORDER BY tweets.created_at DESC;'
+        tweets_with_likes = mysql.query_db(query)
+        print(tweets_with_likes)
+
+        for tweet in all_tweets:
+            if tweet not in tweets_with_likes:
+                tweet['times_liked'] = 0
+        mysql = connectToMySQL('dojo_tweets')
+        query = "SELECT * FROM liked_tweets WHERE users_id = %(user_id)s"
+        data = {
+            'user_id': session['userid']
+        }
+        liked_tweets = [tweet['tweets_id'] for tweet in mysql.query_db(query, data)]
+        print('liked',liked_tweets)
+        for tweet in all_tweets:
             time_since_posted = datetime.datetime.now() - tweet['time_posted']
             days = time_since_posted.days
             hours = time_since_posted.seconds//3600 
@@ -122,11 +137,14 @@ def get_dashboard():
                 tweet['time_posted'] = (0, 0, 0)
             tweet['time_posted'] = (days, hours, minutes)
             print(tweet['time_posted'])
+            if tweet['tweet_id'] in liked_tweets:
+                tweet['already_liked'] = True
+            else:
+                tweet['already_liked'] = False
         
-
-
-
-        return render_template('dashboard.html', user = user,tweets =tweets) 
+        print(all_tweets)
+        
+        return render_template('dashboard.html', user = user,tweets =all_tweets) 
     else:
         return redirect('/')
    
@@ -159,10 +177,36 @@ def create_tweet():
         query = 'insert into tweets (content,created_at, updated_at, users_id) values (%(tweet)s,%(created_at)s,%(updated_at)s,%(user_id)s);'
         result = mysql.query_db(query,data)
         print(result)
-
-        
-
     return redirect('/dashboard')
+
+@app.route('/tweet/like/<tweet_id>', methods = ['GET'])
+def like_tweet(tweet_id):
+    print(tweet_id)
+    mysql = connectToMySQL("dojo_tweets")
+    query = f'insert into liked_tweets (users_id, tweets_id) values ({session["userid"]},{tweet_id});'
+    result = mysql.query_db(query)
+    return redirect('/dashboard')
+
+@app.route('/tweet/unlike/<tweet_id>', methods = ['GET'])
+def unlike_tweet(tweet_id):
+    print(tweet_id)
+    mysql = connectToMySQL("dojo_tweets")
+    query = f'delete from liked_tweets where  users_id = {session["userid"]} and tweets_id={tweet_id};'
+    result = mysql.query_db(query)
+    print(result)
+    return redirect('/dashboard')
+
+@app.route('/tweet/delete/<tweet_id>', methods = ['GET'])
+def delete_tweet(tweet_id):
+    print(tweet_id)
+    mysql = connectToMySQL("dojo_tweets")
+    query = f'delete from tweets where tweets.id ={tweet_id};'
+    delete_liked_tweet = f'delete from liked_tweets where tweets_id={tweet_id};'
+    mysql.query_db(delete_liked_tweet)
+    mysql = connectToMySQL("dojo_tweets")
+    mysql.query_db(query)
+    return redirect('/dashboard')
+
 
 
 if __name__== "__main__":

@@ -38,21 +38,47 @@
                 <div class="container">
                   <h4><b>{{tweet['username']}} says:</b></h4> 
                   <p>{{tweet['tweet']}}</p> 
+
+              
+                 
+
+                    {%if  tweet.times_liked == 1: %}
+                        {{tweet.times_liked}} like
+                    {% else:%}
+                        {{tweet.times_liked}} likes
+                    {%endif%}
+                
+                <br> <br>
                   posted
                   {% if tweet.time_posted[0] %}
                       {{tweet.time_posted[0]}} days
                   {% elif tweet.time_posted[1] %}
-                      {{tweet.time_since_posted[1]}} hours
+                      {{tweet.time_posted[1]}} hours
                   {% elif tweet.time_posted[2] %}
                       {{tweet.time_posted[2]}} minutes
                   {% else %}
                       less than a minute
                   {% endif%}
                   ago
+                
                 </div>
- 
-
+            
+                <div class="buttons">
+                        {% if tweet.already_liked %}
+                        <a href='/tweet/unlike/{{tweet.tweet_id}}'><button>Unlike</button></a>
+                        {% else %}
+                        <button><a href='/tweet/like/{{tweet.tweet_id}}'>Like</a></button>
+                        {% endif %}
+                   
+                    {% if tweet.user_id == session['userid'] %}
+                    <button><a href='/tweet/delete/{{tweet.tweet_id}}'>Delete</a></button>
+                    {%endif%}
+                   
+                </div>
+                
+               
         </div>
+        
         {% endfor%}
     </div>
  

@@ -85,3 +85,13 @@ div.tweets{
   .card:hover {
     box-shadow: 0 8px 16px 0 rgba(0,0,0,0.2);
   }
+
+  .card .buttons{
+   display: flex;
+   justify-content: flex-end;
+  }
+
+  .card .buttons button{
+    margin-right: 5px;
+    margin-bottom: 5px;
+   }
