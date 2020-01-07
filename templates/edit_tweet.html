@@ -1,0 +1,36 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.4.1/css/bootstrap.min.css">
+    <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='css/index.css') }}">
+    <title>Document</title>
+</head>
+<body class="container">
+    <header>
+        <h4>Dojo Tweets </h1>
+        <div class="right_corner">
+           
+            <a href="/logout">Log out</a>
+        </div>
+    </header>
+    <main >
+        <h3>Edit a tweet </h3>
+        <form class="tweet" action="/tweet/edit/{{tweet.id}}" method="POST">
+                <textarea name="tweet" placeholder="What's on your mind?" id="styled">{{tweet['content']}}</textarea>
+                <button type='submit'>Tweet</button>
+                <button><a href='/dashboard' style='color:white'>Cancel</a></button>
+
+        </form>
+        {% with tweet_error = get_flashed_messages(category_filter=["tweet_error"]) %}
+            {% if tweet_error %}
+                {%- for msg in tweet_error %}
+                <small  id="password_help" class="form-text text-muted">{{ msg }}</small>
+                {% endfor %}
+            {% endif %}
+        {% endwith%}
+    </main>
+</body>
+</html>

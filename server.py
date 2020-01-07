@@ -99,7 +99,36 @@ def signup():
 
     return redirect('/get_sign_up')
 
+@app.route('/edit/<tweet_id>', methods = ['GET'])
+def get_edit_page(tweet_id):
+    mysql = connectToMySQL("dojo_tweets")
+    query = f"select * from tweets where tweets.id = {tweet_id};"
+    result = mysql.query_db(query)
+    tweet = None
+    print('get edit page', tweet_id)
+    if result:
+        tweet = result[0]
+    print(tweet)
+    return render_template('edit_tweet.html', tweet = tweet)
 
+@app.route('/tweet/edit/<tweet_id>', methods=['POST'])
+def edit_tweet(tweet_id):
+    isValid = True
+    if len(request.form['tweet']) < 1 or len(request.form['tweet']) > 255:
+        isValid = False
+        flash('Tweets must be between 1 and 255 characters long!','tweet_error') 
+   
+    if isValid:
+        data = {
+            'tweet_id': tweet_id,
+            'tweet': request.form['tweet'],
+            'updated_at': datetime.datetime.now()
+        }
+        mysql = connectToMySQL("dojo_tweets")
+        query = 'update tweets set tweets.content = %(tweet)s , tweets.updated_at = %(updated_at)s;'
+        result = mysql.query_db(query,data)
+        return redirect('/dashboard')
+    return redirect('/edit/'+ tweet_id)
 @app.route('/dashboard',methods =['GET'])
 def get_dashboard():
     if 'userid' in session:
