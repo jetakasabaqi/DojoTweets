@@ -125,7 +125,7 @@ def edit_tweet(tweet_id):
             'updated_at': datetime.datetime.now()
         }
         mysql = connectToMySQL("dojo_tweets")
-        query = 'update tweets set tweets.content = %(tweet)s , tweets.updated_at = %(updated_at)s;'
+        query = 'update tweets set tweets.content = %(tweet)s , tweets.updated_at = %(updated_at)s where tweets.id = %(tweet_id)s;'
         result = mysql.query_db(query,data)
         return redirect('/dashboard')
     return redirect('/edit/'+ tweet_id)
@@ -138,18 +138,18 @@ def get_dashboard():
         user = ''
         if result:
             user = result[0]['fname']
+       
+       
         mysql = connectToMySQL("dojo_tweets")
-        query_all_tweets = 'select tweets.content as tweet, users.fname as username, tweets.created_at as time_posted, users.id as user_id, tweets.id as tweet_id, count(tweets.id) as times_liked FROM liked_tweets RIGHT JOIN   tweets ON liked_tweets.tweets_id =  tweets.id JOIN users ON tweets.users_id = users.id  GROUP BY tweets.id ORDER BY tweets.created_at DESC;'
-        all_tweets =  mysql.query_db(query_all_tweets)
+        query = f'select  tweets.content as tweet, users.fname as username, tweets.created_at as time_posted,tweets.id as tweet_id, count(tweets_id) as times_liked from tweets left join liked_tweets on tweets.id = liked_tweets.tweets_id join users on users.id = tweets.users_id where tweets.id in (select t.id from tweets as t where t.users_id in (select user_being_followed from followed_users where user_following = {session["userid"]}) or t.users_id = {session["userid"]})group by tweets.id; '
+        all_tweets =  mysql.query_db(query)
         print('ALL TWEETS: -------------------------',all_tweets)
-        mysql = connectToMySQL("dojo_tweets")
-        query = 'select tweets.content as tweet, users.fname as username, tweets.created_at as time_posted, users.id as user_id, tweets.id as tweet_id, count(tweets.id) as times_liked FROM liked_tweets LEFT JOIN   tweets ON liked_tweets.tweets_id =  tweets.id JOIN users ON tweets.users_id = users.id  GROUP BY tweets.id ORDER BY tweets.created_at DESC;'
-        tweets_with_likes = mysql.query_db(query)
-        print(tweets_with_likes)
-
-        for tweet in all_tweets:
-            if tweet not in tweets_with_likes:
-                tweet['times_liked'] = 0
+       
+       
+       
+       
+       
+       
         mysql = connectToMySQL('dojo_tweets')
         query = "SELECT * FROM liked_tweets WHERE users_id = %(user_id)s"
         data = {
@@ -157,6 +157,8 @@ def get_dashboard():
         }
         liked_tweets = [tweet['tweets_id'] for tweet in mysql.query_db(query, data)]
         print('liked',liked_tweets)
+       
+       
         for tweet in all_tweets:
             time_since_posted = datetime.datetime.now() - tweet['time_posted']
             days = time_since_posted.days
@@ -177,7 +179,55 @@ def get_dashboard():
     else:
         return redirect('/')
    
+@app.route('/users', methods = ['GET'])
+def get_users():
+    mysql = connectToMySQL('dojo_tweets')
+    data = {
+        'users_id': session['userid']
+    }
+    query = "SELECT * FROM users where users.id != %(users_id)s"
+    followed_query = 'select  user_being_followed as following_user from followed_users  join users on followed_users.user_following = users.id where users.id = %(users_id)s;'
 
+    users = mysql.query_db(query,data)
+    mysql = connectToMySQL('dojo_tweets')
+    users_followed = [user['following_user'] for user in mysql.query_db(followed_query,data)]
+    print(users_followed)
+    if users_followed:
+        for user in users:
+            user['followed'] = False
+            if user['id'] in users_followed:
+                user['followed']= True
+    print(users)
+    return render_template('users.html', users = users)
+
+@app.route('/follow/<user_id>', methods = ['GET'])
+def follow_user(user_id):
+    mysql = connectToMySQL('dojo_tweets')
+    print('User',user_id)
+    data = {
+        'user_following': session['userid'],
+        'user_being_follow': user_id
+    }
+
+    query = "insert into followed_users (user_following, user_being_followed) values ( %(user_following)s, %(user_being_follow)s);"
+    
+
+    
+    users = mysql.query_db(query,data)
+    return redirect('/users')
+
+@app.route('/unfollow/<user_id>', methods = ['GET'])
+def unfollow_user(user_id):
+    mysql = connectToMySQL('dojo_tweets')
+    print('User',user_id)
+    data = {
+        'user_following': session['userid'],
+        'user_being_follow': user_id
+    }
+
+    query = "delete from followed_users where user_following = %(user_following)s and  user_being_followed = %(user_being_follow)s;"
+    mysql.query_db(query,data)
+    return redirect('/users')
 
 @app.route('/logout', methods=["GET"])
 def logout_user():

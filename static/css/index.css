@@ -23,9 +23,10 @@ header{
     padding: 0 5px;
     color: white;
 }
-div.right_corner{
-    display: flex;
+header div h4{
+    margin-right: 10px;
 }
+
 div.right_corner h4{
     padding-right: 25px;
 }
@@ -51,6 +52,9 @@ textarea#styled {
 	background-position: bottom right;
 	background-repeat: no-repeat;
 }
+.users{
+    color: white;
+}
 
 form.tweet {
     display: flex;
@@ -69,7 +73,7 @@ div.tweets{
     color: white;
     padding: 1px 5px;
     margin: 15px 0;
-    height:900px;
+   
 }
 
 .card {

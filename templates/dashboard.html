@@ -4,14 +4,18 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta http-equiv="X-UA-Compatible" content="ie=edge">
-    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.4.1/css/bootstrap.min.css">
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.4.1/css/bootstrap.min.css">
     <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='css/index.css') }}">
     <title>Dojo Tweets Dashboard</title>
 </head>
 <body class="container">
     <header>
-        <h4>Dojo Tweets </h1>
-        <div class="right_corner">
+        <div class="d-flex align-items-center">    
+            <a class = 'users' href="/dashboard"><h4>Dojo Tweets</h4></a>
+            <a class = 'users' href="/users"><h4>Users</h4></a>
+        </div>
+    
+        <div class="right_corner d-flex align-items-center">
             <h4>Welcome, {{user}}</h4>
             <a href="/logout">Log out</a>
         </div>
