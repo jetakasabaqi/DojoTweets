@@ -36,6 +36,10 @@
     </main>
     <div class="tweets">
         <h3>Your feed</h3>
+        {% if not tweets :%}
+        <h3>No tweets yet. Write your first tweet or go follow someone.</h3>
+        {%endif%}
+
 
         {% for tweet in tweets%}
         <div class="card">
@@ -85,6 +89,7 @@
         </div>
         
         {% endfor%}
+    
     </div>
  
 </body>
