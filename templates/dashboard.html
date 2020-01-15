@@ -74,7 +74,7 @@
                         <button><a href='/tweet/like/{{tweet.tweet_id}}'>Like</a></button>
                         {% endif %}
                    
-                    {% if tweet.user_id == session['userid'] %}
+                    {% if tweet.users_id == session['userid'] %}
                     <button><a href='/tweet/delete/{{tweet.tweet_id}}'>Delete</a></button>
                     <button><a href='/edit/{{tweet.tweet_id}}'>Edit</a></button>
                     {%endif%}

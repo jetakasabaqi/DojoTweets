@@ -43,7 +43,7 @@ def login():
     return redirect('/')
 
 
-@app.route("/get_sign_up", methods = ['GET'])
+@app.route("/get_sign_up")
 def load_sign_up():
     if 'userid' in session:
         return redirect('/dashboard')
@@ -99,7 +99,7 @@ def signup():
 
     return redirect('/get_sign_up')
 
-@app.route('/edit/<tweet_id>', methods = ['GET'])
+@app.route('/edit/<tweet_id>')
 def get_edit_page(tweet_id):
     mysql = connectToMySQL("dojo_tweets")
     query = f"select * from tweets where tweets.id = {tweet_id};"
@@ -129,7 +129,7 @@ def edit_tweet(tweet_id):
         result = mysql.query_db(query,data)
         return redirect('/dashboard')
     return redirect('/edit/'+ tweet_id)
-@app.route('/dashboard',methods =['GET'])
+@app.route('/dashboard')
 def get_dashboard():
     if 'userid' in session:
         mysql = connectToMySQL("dojo_tweets")
@@ -141,8 +141,11 @@ def get_dashboard():
        
        
         mysql = connectToMySQL("dojo_tweets")
-        query = f'select  tweets.content as tweet, users.fname as username, tweets.created_at as time_posted,tweets.id as tweet_id, count(tweets_id) as times_liked from tweets left join liked_tweets on tweets.id = liked_tweets.tweets_id join users on users.id = tweets.users_id where tweets.id in (select t.id from tweets as t where t.users_id in (select user_being_followed from followed_users where user_following = {session["userid"]}) or t.users_id = {session["userid"]})group by tweets.id; '
-        all_tweets =  mysql.query_db(query)
+        data ={
+        'user_id': session['userid']
+        } 
+        query = 'select  tweets.content as tweet, users.fname as username, tweets.created_at as time_posted,tweets.id as tweet_id, count(tweets_id)as times_liked, tweets.users_id as users_id  from tweets left join liked_tweets on tweets.id = liked_tweets.tweets_id join users on users.id = tweets.users_id where tweets.id in (select t.id from tweets as t where t.users_id in (select user_being_followed from followed_users where user_following = %(user_id)s) or t.users_id =  %(user_id)s)group by tweets.id order by tweets.created_at DESC; '
+        all_tweets =  mysql.query_db(query, data)
         print('ALL TWEETS: -------------------------',all_tweets)
        
        
@@ -152,9 +155,7 @@ def get_dashboard():
        
         mysql = connectToMySQL('dojo_tweets')
         query = "SELECT * FROM liked_tweets WHERE users_id = %(user_id)s"
-        data = {
-            'user_id': session['userid']
-        }
+       
         liked_tweets = [tweet['tweets_id'] for tweet in mysql.query_db(query, data)]
         print('liked',liked_tweets)
        
@@ -179,7 +180,7 @@ def get_dashboard():
     else:
         return redirect('/')
    
-@app.route('/users', methods = ['GET'])
+@app.route('/users')
 def get_users():
     mysql = connectToMySQL('dojo_tweets')
     data = {
@@ -200,7 +201,7 @@ def get_users():
     print(users)
     return render_template('users.html', users = users)
 
-@app.route('/follow/<user_id>', methods = ['GET'])
+@app.route('/follow/<user_id>')
 def follow_user(user_id):
     mysql = connectToMySQL('dojo_tweets')
     print('User',user_id)
@@ -216,7 +217,7 @@ def follow_user(user_id):
     users = mysql.query_db(query,data)
     return redirect('/users')
 
-@app.route('/unfollow/<user_id>', methods = ['GET'])
+@app.route('/unfollow/<user_id>')
 def unfollow_user(user_id):
     mysql = connectToMySQL('dojo_tweets')
     print('User',user_id)
@@ -229,7 +230,7 @@ def unfollow_user(user_id):
     mysql.query_db(query,data)
     return redirect('/users')
 
-@app.route('/logout', methods=["GET"])
+@app.route('/logout')
 def logout_user():
     session.clear()
     return redirect('/')
@@ -262,28 +263,39 @@ def create_tweet():
 def like_tweet(tweet_id):
     print(tweet_id)
     mysql = connectToMySQL("dojo_tweets")
-    query = f'insert into liked_tweets (users_id, tweets_id) values ({session["userid"]},{tweet_id});'
-    result = mysql.query_db(query)
+    data ={
+        'user_id': session['userid'],
+        'tweet_id': tweet_id
+    } 
+    query = 'insert into liked_tweets (users_id, tweets_id) values (%(user_id)s,%(tweet_id)s);'
+    result = mysql.query_db(query,data)
     return redirect('/dashboard')
 
-@app.route('/tweet/unlike/<tweet_id>', methods = ['GET'])
+@app.route('/tweet/unlike/<tweet_id>')
 def unlike_tweet(tweet_id):
     print(tweet_id)
     mysql = connectToMySQL("dojo_tweets")
-    query = f'delete from liked_tweets where  users_id = {session["userid"]} and tweets_id={tweet_id};'
-    result = mysql.query_db(query)
+    data ={
+        'user_id': session['userid'],
+        'tweet_id': tweet_id
+    } 
+    query = 'delete from liked_tweets where  users_id = %(user_id)s and tweets_id=%(tweet_id)s;'
+    result = mysql.query_db(query,data)
     print(result)
     return redirect('/dashboard')
 
-@app.route('/tweet/delete/<tweet_id>', methods = ['GET'])
+@app.route('/tweet/delete/<tweet_id>')
 def delete_tweet(tweet_id):
     print(tweet_id)
     mysql = connectToMySQL("dojo_tweets")
-    query = f'delete from tweets where tweets.id ={tweet_id};'
-    delete_liked_tweet = f'delete from liked_tweets where tweets_id={tweet_id};'
-    mysql.query_db(delete_liked_tweet)
+    data ={
+        'tweet_id': tweet_id
+    } 
+    query = 'delete from tweets where tweets.id =%(tweet_id)s;'
+    delete_liked_tweet = 'delete from liked_tweets where tweets_id=%(tweet_id)s;'
+    mysql.query_db(delete_liked_tweet,data)
     mysql = connectToMySQL("dojo_tweets")
-    mysql.query_db(query)
+    mysql.query_db(query,data)
     return redirect('/dashboard')
 
 
