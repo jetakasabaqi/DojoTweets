@@ -143,9 +143,10 @@ def get_dashboard():
         mysql = connectToMySQL("dojo_tweets")
         data ={
         'user_id': session['userid']
-        } 
-        query = 'select  tweets.content as tweet, users.fname as username, tweets.created_at as time_posted,tweets.id as tweet_id, count(tweets_id)as times_liked, tweets.users_id as users_id  from tweets left join liked_tweets on tweets.id = liked_tweets.tweets_id join users on users.id = tweets.users_id where tweets.id in (select t.id from tweets as t where t.users_id in (select user_being_followed from followed_users where user_following = %(user_id)s) or t.users_id =  %(user_id)s)group by tweets.id order by tweets.created_at DESC; '
-        all_tweets =  mysql.query_db(query, data)
+            } 
+        query = 'select  tweets.content as tweet, users.fname as username, tweets.created_at as time_posted,tweets.id as tweet_id, count(tweets_id)as times_liked, tweets.users_id as users_id  from tweets left join liked_tweets on tweets.id = liked_tweets.tweets_id join users on users.id = tweets.users_id where tweets.id in (select t.id from tweets as t where t.users_id in (select user_being_followed from followed_users where user_following = %(user_id)s) or t.users_id =  %(user_id)s)group by tweets.id order by tweets.created_at DESC; ' 
+        all_tweets =  mysql.query_db(query)
+
         print('ALL TWEETS: -------------------------',all_tweets)
        
        
