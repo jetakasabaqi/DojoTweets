@@ -19,7 +19,7 @@
     <main >
         <h3>Edit a tweet </h3>
         <form class="tweet" action="/tweet/edit/{{tweet.id}}" method="POST">
-                <textarea name="tweet" placeholder="What's on your mind?" id="styled">{{tweet['content']}}</textarea>
+                <textarea name="tweet" placeholder="What's on your mind?" id="styled">{{tweet.message}}</textarea>
                 <button type='submit'>Tweet</button>
                 <button><a href='/dashboard' style='color:white'>Cancel</a></button>
 

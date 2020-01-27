@@ -16,7 +16,7 @@
         </div>
     
         <div class="right_corner d-flex align-items-center">
-            <h4>Welcome, {{user}}</h4>
+            <h4>Welcome, {{user.first_name}}</h4>
             <a href="/logout">Log out</a>
         </div>
     </header>
@@ -44,8 +44,8 @@
         {% for tweet in tweets%}
         <div class="card">
                 <div class="container">
-                  <h4><b>{{tweet['username']}} says:</b></h4> 
-                  <p>{{tweet['tweet']}}</p> 
+                  <h4><b>{{tweet.author.first_name}} says:</b></h4> 
+                  <p>{{tweet.message}}</p> 
 
               
                  
@@ -73,14 +73,14 @@
             
                 <div class="buttons">
                         {% if tweet.already_liked %}
-                        <a href='/tweet/unlike/{{tweet.tweet_id}}'><button>Unlike</button></a>
+                        <a href='/tweet/unlike/{{tweet.id}}'><button>Unlike</button></a>
                         {% else %}
-                        <button><a href='/tweet/like/{{tweet.tweet_id}}'>Like</a></button>
+                        <button><a href='/tweet/like/{{tweet.id}}'>Like</a></button>
                         {% endif %}
                    
-                    {% if tweet.users_id == session['userid'] %}
-                    <button><a href='/tweet/delete/{{tweet.tweet_id}}'>Delete</a></button>
-                    <button><a href='/edit/{{tweet.tweet_id}}'>Edit</a></button>
+                    {% if tweet.author_id == session['userid'] %}
+                    <button><a href='/tweet/delete/{{tweet.id}}'>Delete</a></button>
+                    <button><a href='/edit/{{tweet.id}}'>Edit</a></button>
                     {%endif%}
                    
                 </div>

@@ -30,7 +30,7 @@
                 <tbody>
                     {% for user in users: %}
                   <tr>
-                    <td>{{user.fname}}</td>
+                    <td>{{user.first_name}}</td>
                     <td>{{user.email}}</td>
                     {% if user.followed %}
                     <td><a href="/unfollow/{{user.id}}">Unfollow</a></td>
