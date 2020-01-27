@@ -4,11 +4,94 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta http-equiv="X-UA-Compatible" content="ie=edge">
-    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.4.1/css/bootstrap.min.css">
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.4.1/css/bootstrap.min.css">
     <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='css/index.css') }}">
     <title>Dojo Tweets Dashboard</title>
 </head>
-<body>
-    <a href="/logout"><h4>Log out</h4></a>
+<body class="container">
+    <header>
+        <div class="d-flex align-items-center">    
+            <a class = 'users' href="/dashboard"><h4>Dojo Tweets</h4></a>
+            <a class = 'users' href="/users"><h4>Users</h4></a>
+        </div>
+    
+        <div class="right_corner d-flex align-items-center">
+            <h4>Welcome, {{user}}</h4>
+            <a href="/logout">Log out</a>
+        </div>
+    </header>
+    <main >
+        <h3>Write a tweet </h3>
+        <form class="tweet" action="/tweet/create" method="POST">
+                <textarea name="tweet" placeholder="What's on your mind?" id="styled"></textarea>
+                <button type='submit'>Tweet</button>
+        </form>
+        {% with tweet_error = get_flashed_messages(category_filter=["tweet_error"]) %}
+            {% if tweet_error %}
+                {%- for msg in tweet_error %}
+                <small  id="password_help" class="form-text text-muted">{{ msg }}</small>
+                {% endfor %}
+            {% endif %}
+        {% endwith%}
+    </main>
+    <div class="tweets">
+        <h3>Your feed</h3>
+        {% if not tweets :%}
+        <h3>No tweets yet. Write your first tweet or go follow someone.</h3>
+        {%endif%}
+
+
+        {% for tweet in tweets%}
+        <div class="card">
+                <div class="container">
+                  <h4><b>{{tweet['username']}} says:</b></h4> 
+                  <p>{{tweet['tweet']}}</p> 
+
+              
+                 
+
+                    {%if  tweet.times_liked == 1: %}
+                        {{tweet.times_liked}} like
+                    {% else:%}
+                        {{tweet.times_liked}} likes
+                    {%endif%}
+                
+                <br> <br>
+                  posted
+                  {% if tweet.time_posted[0] %}
+                      {{tweet.time_posted[0]}} days
+                  {% elif tweet.time_posted[1] %}
+                      {{tweet.time_posted[1]}} hours
+                  {% elif tweet.time_posted[2] %}
+                      {{tweet.time_posted[2]}} minutes
+                  {% else %}
+                      less than a minute
+                  {% endif%}
+                  ago
+                
+                </div>
+            
+                <div class="buttons">
+                        {% if tweet.already_liked %}
+                        <a href='/tweet/unlike/{{tweet.tweet_id}}'><button>Unlike</button></a>
+                        {% else %}
+                        <button><a href='/tweet/like/{{tweet.tweet_id}}'>Like</a></button>
+                        {% endif %}
+                   
+                    {% if tweet.users_id == session['userid'] %}
+                    <button><a href='/tweet/delete/{{tweet.tweet_id}}'>Delete</a></button>
+                    <button><a href='/edit/{{tweet.tweet_id}}'>Edit</a></button>
+                    {%endif%}
+                   
+                </div>
+                
+               
+        </div>
+        
+        {% endfor%}
+    
+    </div>
+ 
 </body>
+
 </html>
