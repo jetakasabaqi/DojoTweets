@@ -8,6 +8,14 @@ form.login{
 #password_help{
     color: tomato;
 }
+
+.error{
+    color: tomato;
+}
+
+.success{
+    color: green;
+}
 .sign_up{
     display: flex;
 }

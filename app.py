@@ -266,7 +266,16 @@ def delete_tweet(tweet_id):
     db.session.commit()
     return redirect('/dashboard')
 
+@app.route("/validate_email", methods = ['POST'])
+def validate_email():
+    found = False
+    print(request.form['email'])
+    user = User.query.filter_by(email = request.form['email']).all()
+    if user:
+        found = True
+    print(user)
 
-
+    print(found)
+    return render_template('email_exists.html', found = found)
 if __name__== "__main__":
     app.run(debug=True)

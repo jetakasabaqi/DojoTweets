@@ -6,7 +6,27 @@
     <meta http-equiv="X-UA-Compatible" content="ie=edge">
     <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.4.1/css/bootstrap.min.css">
     <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='css/index.css') }}">
+    <script
+  src="https://code.jquery.com/jquery-3.4.1.min.js"
+  integrity="sha256-CSXorXvZcTkaix6Yvo6HppcZGetbYMGWSFlBw8HfCJo="
+  crossorigin="anonymous">
+  </script>
     <title>Sign up</title>
+    <script>
+        $(document).ready(function() {
+            $('#email').keyup(function (){
+                var data = $(".login").serialize()
+                $.ajax({
+                    method: 'POST',
+                    url: "/validate_email",
+                    data: data
+                })
+                .done(function(res){
+                    $('.email_exists').html(res)
+                })
+            })
+        })
+    </script>
 </head>
 <body>
     <div class="container">
@@ -36,7 +56,7 @@
             </div>
             <div class="form-group">
               <label >Email address</label>
-              <input type="email" name="email" class="form-control"  name="email" placeholder="Enter email">
+              <input type="email" name="email" class="form-control" id ="email" placeholder="Enter email">
               {% with email_error = get_flashed_messages(category_filter=["email_error"]) %}
               {% if email_error %}
                   {%- for msg in email_error %}
@@ -44,6 +64,7 @@
                   {% endfor %}
               {% endif %}
           {% endwith%}
+                <div id="password_help" class="email_exists"></div>
             </div>
             <div class="form-group">
               <label>Password</label>
