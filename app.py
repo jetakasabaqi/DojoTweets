@@ -277,5 +277,12 @@ def validate_email():
 
     print(found)
     return render_template('email_exists.html', found = found)
+
+@app.route("/search_users", methods = ['POST'])
+def search_users():
+    print(request.form['search'])
+    search_term = "%{}%".format(request.form['search'])
+    users = User.query.filter(User.first_name.like(search_term)).all()
+    return render_template('search_result.html', users = users)
 if __name__== "__main__":
     app.run(debug=True)
